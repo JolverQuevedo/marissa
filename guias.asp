@@ -32,6 +32,7 @@
                     <li class="active"><a href="./guias.asp">Guias</a></li>
                     <li><a href="./facturas.asp">facturas</a></li>
                     <li><a href="./oc.asp">Ordenes Compra</a></li>
+                    <li class="pull-right" v-on:click="cerrar()"><a >Cerrar Sesion</a></li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -307,9 +308,15 @@
         oc:[]
       },
       mounted: function () {
+        this.user();
         this.getGuias();
       },
       methods: {
+          user(){
+			if(localStorage.getItem("user")== null){
+				window.location.href="/marissa/index.asp"
+			}
+		  },
         getGuias: function () {
           axios.get("/marissa/lists/guias.asp").then(
             (res) => {
@@ -390,6 +397,10 @@
 
 
 		},
+        cerrar(){
+            localStorage.removeItem("user");
+            window.location.href="/marissa/index.asp";
+          },
     verDatos:function(item){
       $("#myModaldetalle").modal("toggle");
       var cadf = "http://localhost/marissa/lists/facturas.asp?cliente="+item.cliente+"&po="+item.po+"&estilo="+item.estilo;

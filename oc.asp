@@ -34,6 +34,8 @@
             <li ><a href="./guias.asp">Guias</a></li>
             <li ><a href="./facturas.asp">facturas</a></li>
             <li class="active"><a href="./oc.asp">Ordenes Compra</a></li>
+            <li class="pull-right" v-on:click="cerrar()"><a >Cerrar Sesion</a></li>
+            
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
@@ -260,8 +262,14 @@
       },
       mounted: function () {
           this.getOC();
+          this.user();
       },
       methods: {
+        user(){
+			if(localStorage.getItem("user")== null){
+				window.location.href="/marissa/index.asp"
+			}
+		  },
           getOC(){
               var cad="/marissa/lists/oc.asp"
               axios.get(cad).then((res)=>{
@@ -358,6 +366,10 @@
               $('#myModaldetalle').modal('toggle');
               this.oc=oc;
               this.getdetalle();
+          },
+          cerrar(){
+            localStorage.removeItem("user");
+            window.location.href="/marissa/index.asp";
           },
           actualizartotal:function(id,total,igv){
               var cad="/marissa/comun/updatetotaloc.asp?id="+id+"&total="+total+"&igv="+igv

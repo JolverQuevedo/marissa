@@ -34,6 +34,7 @@
             <li><a href="./guias.asp">Guias</a></li>
             <li class="active"><a href="./facturas.asp">facturas</a></li>
             <li><a href="./oc.asp">Ordenes Compra</a></li>
+            <li class="pull-right" v-on:click="cerrar()"><a >Cerrar Sesion</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
@@ -295,8 +296,14 @@
       },
       mounted: function () {
         this.getFacturas();
+        this.user();
       },
       methods: {
+        user(){
+			if(localStorage.getItem("user")== null){
+				window.location.href="/marissa/index.asp"
+			}
+		  },
        getFacturas: function () {
           axios.get("/marissa/lists/facturas.asp").then(
             (res) => {
@@ -358,6 +365,10 @@
 
 
         },
+        cerrar(){
+            localStorage.removeItem("user");
+            window.location.href="/marissa/index.asp";
+          },
         verdetalle:function(factura){
           $("#myModaldetalle").modal("show");
           this.factura={};

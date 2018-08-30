@@ -2,7 +2,7 @@
 
 <%
 
-cad = "select descripcion,cantidad,preciounit,subtotal,igv from rhin..factura_det where id_fact='"&request.querystring("id")&"'"
+cad = "select id,id_fact,descripcion,cantidad,preciounit,subtotal,igv from rhin..factura_det where id_fact='"&request.querystring("id")&"' and  estado='A'"
 
 
 

@@ -8,7 +8,7 @@ cnn.CommandTimeout = 900
 '   ESTE ES EL QUE ESTOY USANDO EN LA CASA y en EL MODELADOR
 '***********************************************************************************************
 dim txtConexion 
-txtConexion = "Provider=SQLOLEDB; Data Source=PC-JQUEVEDO\SQLEXPRESS ; Initial Catalog=rhin; User id=SA; Password=123456" 
+txtConexion = "Provider=SQLOLEDB; Data Source=SERVSQL\MSSQLSERVER1 ; Initial Catalog=rhin; User id=SA; Password=F3QY17" 
  Cnn.Open txtConexion
 
 Set RS = Server.CreateObject("ADODB.Recordset")

@@ -199,7 +199,7 @@
   
 
 <div class="modal fade" id="myModaldetalle" tabindex="-1" role="dialog" aria-labelledby="myModaldetalleLabel">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog" role="document" style="width:800px">
       <div class="modal-content">
 
         <div class="modal-header">
@@ -233,6 +233,7 @@
                     <th>Igv</th>
                     
                     <th>Total</th>
+                    <th>Accion</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -243,6 +244,7 @@
                     <td>{{d.subtotal}}</td>
                     <td>{{Math.round(d.igv*100)/100}}</td>
                     <td>{{Math.round(((d.subtotal*1)+(d.igv*1))*100)/100}}</td>
+                    <td><button class="btn btn-danger btn-sm" v-on:click="eliminardt(d)">eliminar</button></td>
                   </tr>
                   <tr>
                     <td><input type="text" id="txtdescripcion" style="width:100%"></td>
@@ -250,7 +252,7 @@
                     <td><input type="number" onchange="calcula()" id="txtpreciounit" style="width:100%"></td>
                     <td><input type="number" id="txtsubtotat" readonly style="width:100%"></td>
                     <td><input type="number" id="txtigv2" style="width:100%"></td>
-                    
+                    <td><label id="lbltotal">0.0</label></td>
                     <td><button style="width:100%;background:#333;color:#fff;border:1px solid #333" v-on:click="guardardetalle()">Guardar</button></td>
                   
                   </tr>
@@ -307,6 +309,15 @@
             }
           );
         },
+        eliminardt:function(detalle){
+          if(confirm("Deseas eliminar este detalle?")){
+            var cad="/marissa/comun/deletedetallefact.asp?id="+detalle.id+"&ft="+detalle.id_fact;
+            console.log(cad);
+            axios.get(cad).then(res=>{
+              this.verdetalle(this.factura);
+            })
+          }
+        },
         guardardetalle:function(){
           this.cargando=true;
           id_fact=this.factura.id;
@@ -336,6 +347,7 @@
               $("#txtpreciounit").val("");
               $("#txtsubtotat").val("");
               $("#txtigv2").val("");
+              $("#lbltotal").text("")
               $("#txtdescripcion").focus();
             }
           ).catch(
@@ -350,9 +362,13 @@
           $("#myModaldetalle").modal("show");
           this.factura={};
           this.factura=factura;
-          this.detalle=[];
+          this.detalle=[]; 
           axios.get("/marissa/lists/detallefactura.asp?id="+factura.id).then(
             (res) => {
+              console.log("detalle",res.data.data);
+              if(res.data.data=={} || res.data.data==undefined){
+                this.actualizartotal(this.factura.id,0,0);    
+              }
               this.detalle=res.data.data;
               this.total=0.00;
               this.igv=0.00;
@@ -361,16 +377,16 @@
                  this.total += parseFloat(a.subtotal)+parseFloat(a.igv);
                  this.igv =parseFloat(this.igv) + parseFloat(a.igv);
               }
+              this.actualizartotal(this.factura.id,this.total,this.igv);    
               
-              this.actualizartotal(this.factura.id,this.total,this.igv);
             }
           ).catch(
             (error) => {
-
+              
             }
           );
-
-
+          
+          
 
         },
         actualizartotal:function(id,total,igv){
@@ -380,8 +396,9 @@
           console.log(cad);
           axios.get(cad).then((res)=>{
               console.log(res);
+              this.getFacturas();
           });
-          this.getFacturas();
+          
         },
         guardarFactura:function(){
           var cliente=$("#txtcliente").val();
@@ -440,11 +457,18 @@
       preciounit=$("#txtpreciounit").val();
       subtotat=$("#txtsubtotat").val(cantidad*preciounit);
       console.log(app.factura.tipo);
+      var t=cantidad*preciounit+((cantidad*preciounit)*0.18);
+      $("#lbltotal").text(round(t));
       if(!app.factura.tipo.includes("e")){
-      igv=$("#txtigv2").val((cantidad*preciounit)*0.18);
+        var i=round((cantidad*preciounit)*0.18,2);
+        $("#txtigv2").val(i);
       }else{
         $("#txtigv2").val(0);
-        }
+      }
+    }
+    function round(num, precision = 2) {
+      var scaled = Math.round(num + "e" + precision);
+      return Number(scaled + "e" + -precision);
     }
   </script>
 

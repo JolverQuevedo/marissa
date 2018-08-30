@@ -84,7 +84,7 @@
 					console.log(res);
 					if(res.data.data.length >0){
 						window.location.href="/marissa/guias.asp"
-						localStorage.setItem("user",res.data.data[0].usuario)
+						localStorage.setItem("user",res.data.data[0].USUARIO)
 					}
 				}
 			);

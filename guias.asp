@@ -403,9 +403,9 @@
           },
     verDatos:function(item){
       $("#myModaldetalle").modal("toggle");
-      var cadf = "http://localhost/marissa/lists/facturas.asp?cliente="+item.cliente+"&po="+item.po+"&estilo="+item.estilo;
+      var cadf = "/marissa/lists/facturas.asp?cliente="+item.cliente+"&po="+item.po+"&estilo="+item.estilo;
       axios.get(cadf).then(res=>{this.facturas=res.data.data}).catch();
-      var cado = "http://localhost/marissa/lists/oc.asp?cliente="+item.cliente+"&po="+item.po+"&estilo="+item.estilo;
+      var cado = "/marissa/lists/oc.asp?cliente="+item.cliente+"&po="+item.po+"&estilo="+item.estilo;
       axios.get(cado).then(res=>{this.oc=res.data.data}).catch();
     },
         buscar: function () {

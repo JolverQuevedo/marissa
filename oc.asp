@@ -1,16 +1,24 @@
+<% Response.CacheControl = "no-cache" %>
+<% Response.Buffer = true %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <title>Ordernes de Compra</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1,
       maximum-scale=1, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="https://bootswatch.com/3/flatly/bootstrap.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="./js/jquery.dataTables.js"></script>
+
+
+
   <style>
          table{
          font-size:1.2rem;
@@ -262,181 +270,176 @@
 
 
   <!--VUE-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./js/vue.min.js"></script>
+  <script src="./js/axios.min.js"></script>
   <script>
-    var idt=0;
-    var app = new Vue({
-      el: '#app',
-      data: {
+var idt = 0;
+var app = new Vue({
+    el: '#app',
+    data: {
         list: [],
-        total:0,
-        igv:0,
-        detalle:[],
-        newdetalle:[],
-        cargando:false,
-        oc:{}
-      },
-      mounted: function () {
-          this.getOC();
-          this.user();
-      },
-      methods: {
-        user(){
-			if(localStorage.getItem("user")== null){
-				window.location.href="/marissa/index.asp"
-			}
-		  },
-          getOC(){
-              var cad="/marissa/lists/oc.asp"
-              axios.get(cad).then((res)=>{
-                  this.list=res.data.data;
-                  this.initDt();
-              }).catch();
-          },
-          registradetalle(){
-            var oc_id=this.oc.id;
-            var po=this.oc.po;
-            var estilo=this.oc.estilo;
-            var nro_orden=this.oc.nro_orden;
-            var proveedor=this.oc.proveedor;
-            var descripcion=$("#txtdescripcion").val();
-            var cantidad=$("#txtcantidad").val();
-            var unidad=$("#txtunidad").val();
-            var corte=$("#txtcorte").val();
-            var combo=$("#txtcombo").val();
-            var preciounit=$("#txtpreciounit").val();
-            var subtotat=$("#txtsubtotat").val();
-            var igv=$("#txtigv2").val();
-            
-            
-            var cad ="/marissa/comun/insertdetalleoc.asp?";
-            cad+="oc_id="+oc_id;
-            cad+="&po="+po;
-            cad+="&estilo="+estilo;
-            cad+="&nro_orden="+nro_orden;
-            cad+="&proveedor="+proveedor;
-            cad+="&cantidad="+cantidad;
-            cad+="&unidad="+unidad;
-            cad+="&corte="+corte;
-            cad+="&combo="+combo;
-            cad+="&descripcion="+descripcion;
-            cad+="&preciounit="+preciounit;
-            cad+="&subtotal="+subtotat;
-            cad+="&igv="+igv;
-            axios.get(cad).then((res)=>{
-              console.log(res);
-              this.getdetalle();
-              $("#txtdescripcion").val("");
-              $("#txtcantidad").val("");
-              $("#txtunidad").val("");
-              $("#txtcorte").val("");
-              $("#txtcombo").val("");
-              $("#txtpreciounit").val("");
-              $("#txtsubtotat").val("");
-              $("#txtigv2").val("");
-              $("#lbltotal").text("");
-            });
-
-
-
-
-
-
-
-          },
-          initDt(){
-            if(idt == 0){
-                  setTimeout(() => {
-                       $(document).ready( function () {
-                         $('#table').DataTable();
-                         idt=1;
-                     } );
-                   }, 100);
-                   
-            }else{
-              $('#table').DataTable().reload();
+        total: 0,
+        igv: 0,
+        detalle: [],
+        newdetalle: [],
+        cargando: false,
+        oc: {}
+    },
+    mounted: function () {
+        this.getOC();
+        this.user();
+    },
+    methods: {
+        user: function () {
+            if (localStorage.getItem("user") == null) {
+                window.location.href = "/marissa/index.asp";
             }
-                   
-               },
-          cambiatotales(){
-            var cantidad=$("#txtcantidad").val();
-            var preciounit=$("#txtpreciounit").val();
-            $("#txtsubtotat").val(Math.round(cantidad*preciounit*1000)/1000);
-            $("#txtigv2").val(Math.round(cantidad*preciounit*1000)/1000*0.18);
-            $("#lbltotal").text(Math.round(cantidad*preciounit*1000)/1000+Math.round(cantidad*preciounit*1000)/1000*0.18);
-          },
-          guardar(){
-            var cliente=$("#txtcliente").val();
-            var po=$("#txtpo").val();
-            var estilo=$("#txtestilo").val();
-            var nro_orden=$("#txtnro_orden").val();
-            var proveedor=$("#txtproveedor").val();
-            var presupuesto=$("#txtpresupuesto").val();
-            var total=$("#txttotal").val();
-
-            var cad="/marissa/comun/insertoc.asp?"
-            cad+="cliente="+cliente+"&"
-            cad+="po="+po+"&"
-            cad+="estilo="+estilo+"&"
-            cad+="nro_orden="+nro_orden+"&"
-            cad+="proveedor="+proveedor+"&"
-            cad+="presupuesto="+presupuesto+"&"
-            cad+="total="+total
-            axios.get(cad).then((res)=>{
-                  console.log(res.data);
-                  this.getOC();
-                    $("#txtcliente").val("");
-                    $("#txtpo").val("");
-                    $("#txtestilo").val("");
-                    $("#txtnro_orden").val("");
-                    $("#txtproveedor").val("");
-                    $("#txtpresupuesto").val("");
-                    $("#txttotal").val("");
-              }).catch();
-          },mostrardetalle(oc){
-              $('#myModaldetalle').modal('toggle');
-              this.oc=oc;
-              this.getdetalle();
-          },
-          eliminaroc(item){
-            axios.get("/marissa/comun/deleteoc.asp?id="+item.id).then((res)=>{
-              console.log(item);
-              console.log(res);
-              this.getOC();
+        },
+        getOC: function () {
+            var _this = this;
+            var cad = "/marissa/lists/oc.asp";
+            axios.get(cad).then(function (res) {
+                _this.list = res.data.data;
+                _this.initDt();
+            }).catch();
+        },
+        registradetalle: function () {
+            var _this = this;
+            var oc_id = this.oc.id;
+            var po = this.oc.po;
+            var estilo = this.oc.estilo;
+            var nro_orden = this.oc.nro_orden;
+            var proveedor = this.oc.proveedor;
+            var descripcion = $("#txtdescripcion").val();
+            var cantidad = $("#txtcantidad").val();
+            var unidad = $("#txtunidad").val();
+            var corte = $("#txtcorte").val();
+            var combo = $("#txtcombo").val();
+            var preciounit = $("#txtpreciounit").val();
+            var subtotat = $("#txtsubtotat").val();
+            var igv = $("#txtigv2").val();
+            var cad = "/marissa/comun/insertdetalleoc.asp?";
+            cad += "oc_id=" + oc_id;
+            cad += "&po=" + po;
+            cad += "&estilo=" + estilo;
+            cad += "&nro_orden=" + nro_orden;
+            cad += "&proveedor=" + proveedor;
+            cad += "&cantidad=" + cantidad;
+            cad += "&unidad=" + unidad;
+            cad += "&corte=" + corte;
+            cad += "&combo=" + combo;
+            cad += "&descripcion=" + descripcion;
+            cad += "&preciounit=" + preciounit;
+            cad += "&subtotal=" + subtotat;
+            cad += "&igv=" + igv;
+            axios.get(cad).then(function (res) {
+                console.log(res);
+                _this.getdetalle();
+                $("#txtdescripcion").val("");
+                $("#txtcantidad").val("");
+                $("#txtunidad").val("");
+                $("#txtcorte").val("");
+                $("#txtcombo").val("");
+                $("#txtpreciounit").val("");
+                $("#txtsubtotat").val("");
+                $("#txtigv2").val("");
+                $("#lbltotal").text("");
             });
-          },
-          cerrar(){
+        },
+        initDt: function () {
+            if (idt == 0) {
+                setTimeout(function () {
+                    $(document).ready(function () {
+                        $('#table').DataTable();
+                        idt = 1;
+                    });
+                }, 100);
+            }
+            else {
+                $('#table').DataTable().reload();
+            }
+        },
+        cambiatotales: function () {
+            var cantidad = $("#txtcantidad").val();
+            var preciounit = $("#txtpreciounit").val();
+            $("#txtsubtotat").val(Math.round(cantidad * preciounit * 1000) / 1000);
+            $("#txtigv2").val(Math.round(cantidad * preciounit * 1000) / 1000 * 0.18);
+            $("#lbltotal").text(Math.round(cantidad * preciounit * 1000) / 1000 + Math.round(cantidad * preciounit * 1000) / 1000 * 0.18);
+        },
+        guardar: function () {
+            var _this = this;
+            var cliente = $("#txtcliente").val();
+            var po = $("#txtpo").val();
+            var estilo = $("#txtestilo").val();
+            var nro_orden = $("#txtnro_orden").val();
+            var proveedor = $("#txtproveedor").val();
+            var presupuesto = $("#txtpresupuesto").val();
+            var total = $("#txttotal").val();
+            var cad = "/marissa/comun/insertoc.asp?";
+            cad += "cliente=" + cliente + "&";
+            cad += "po=" + po + "&";
+            cad += "estilo=" + estilo + "&";
+            cad += "nro_orden=" + nro_orden + "&";
+            cad += "proveedor=" + proveedor + "&";
+            cad += "presupuesto=" + presupuesto + "&";
+            cad += "total=" + total;
+            axios.get(cad).then(function (res) {
+                console.log(res.data);
+                _this.getOC();
+                $("#txtcliente").val("");
+                $("#txtpo").val("");
+                $("#txtestilo").val("");
+                $("#txtnro_orden").val("");
+                $("#txtproveedor").val("");
+                $("#txtpresupuesto").val("");
+                $("#txttotal").val("");
+            }).catch();
+        }, mostrardetalle: function (oc) {
+            $('#myModaldetalle').modal('toggle');
+            this.oc = oc;
+            this.getdetalle();
+        },
+        eliminaroc: function (item) {
+            var _this = this;
+            axios.get("/marissa/comun/deleteoc.asp?id=" + item.id).then(function (res) {
+                console.log(item);
+                console.log(res);
+                _this.getOC();
+            });
+        },
+        cerrar: function () {
             localStorage.removeItem("user");
-            window.location.href="/marissa/index.asp";
-          },
-          actualizartotal:function(id,total,igv){
-              var cad="/marissa/comun/updatetotaloc.asp?id="+id+"&total="+total+"&igv="+igv
-              console.log(cad);
-              axios.get(cad).then((res)=>{
-                  console.log(res);
-                 
-              });
-              this.getOC();
-          },
-          getdetalle(){
-            var cad = "/marissa/lists/detalleoc.asp?id="+this.oc.id;
-            axios.get(cad).then((res)=>{
-              this.detalle=res.data.data;
-              this.total=0;
-              this.igv=0;
-              for(let i of this.detalle){
-                this.total += parseFloat(i.subtotal)+parseFloat(i.igv)
-                this.igv += parseFloat(i.igv)
-              }
-              this.actualizartotal(this.oc.id,this.total,this.igv)
+            window.location.href = "/marissa/index.asp";
+        },
+        actualizartotal: function (id, total, igv) {
+            var cad = "/marissa/comun/updatetotaloc.asp?id=" + id + "&total=" + total + "&igv=" + igv;
+            console.log(cad);
+            axios.get(cad).then(function (res) {
+                console.log(res);
             });
-          }
-      }
-    });
-    function buscarguia(){
-      window.open("./help/hlpguiaoc.asp","","width=900,height=500");
+            this.getOC();
+        },
+        getdetalle: function () {
+            var _this = this;
+            var cad = "/marissa/lists/detalleoc.asp?id=" + this.oc.id;
+            axios.get(cad).then(function (res) {
+                _this.detalle = res.data.data;
+                _this.total = 0;
+                _this.igv = 0;
+                for (var _i = 0, _a = _this.detalle; _i < _a.length; _i++) {
+                    var i = _a[_i];
+                    _this.total += parseFloat(i.subtotal) + parseFloat(i.igv);
+                    _this.igv += parseFloat(i.igv);
+                }
+                _this.actualizartotal(_this.oc.id, _this.total, _this.igv);
+            });
+        }
     }
+});
+function buscarguia() {
+    window.open("./help/hlpguia.asp", "", "width=900,height=500");
+}
+
   </script>
 </body>
 

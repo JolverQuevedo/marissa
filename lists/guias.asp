@@ -1,8 +1,9 @@
 <!--#include file="../includes/Cnn.inc"-->
 <% session.LCID = 2057 %>
+<% Response.CacheControl = "no-cache" %>
 <%
 
-cad = "select presupuesto,cliente,po,estilo,serie,numdoc,proveedor,fecha_emision,fecha_traslado,nro_orden,corte,num_prendas,tip_servicio,estado from [rhin]..guia where estado='A'"
+cad = "select presupuesto,cliente,po,estilo,serie,numdoc,proveedor,fecha_emision,fecha_traslado,nro_orden,corte,num_prendas,tip_servicio,estado from [rhin]..guia where rtrim(ltrim(estado))='A'"
 
 if request.querystring("cliente") <> undefined then
     cad = cad + "and cliente LIKE '%"&request.querystring("cliente")&"%'"

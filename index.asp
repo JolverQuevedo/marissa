@@ -1,14 +1,26 @@
+<% Response.CacheControl = "no-cache" %>
+<% Response.Buffer = true %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <title>RHIN</title>
+  <title>Rhin</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1,
       maximum-scale=1, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="https://bootswatch.com/3/flatly/bootstrap.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
+
+  <link rel="stylesheet" href="/marissa/css/bootstrap.min.css">
+  <script src="/marissa/js/jquery.min.js"></script>
+  <script src="/marissa/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/marissa/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="/marissa/js/jquery.dataTables.js"></script>
+  <script src="/marissa/js/vue.min.js"></script>
+  <script src="/marissa/js/axios.min.js"></script>
+
+
+
 </head>
 
 <body>
@@ -54,8 +66,7 @@
 
 
   <!--VUE-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  
   <script>
     var app = new Vue({
       el: '#app',
@@ -68,19 +79,19 @@
         this.user();
       },
       methods: {
-		  user(){
+		  user:function(){
 			if(localStorage.getItem("user")!= null){
 				window.location.href="/marissa/guias.asp"
 			}
 		  },
 		  
-		  login(){
+		  login:function(){
 			  var usuario=$("#txtusuario").val();
 			  var clave=$("#txtclave").val();
 			  var cad="/marissa/lists/login.asp?usuario="+usuario+"&clave="+clave;
 			  console.log(cad);
 			axios.get(cad).then(
-				res=>{
+				function(res){
 					console.log(res);
 					if(res.data.data.length >0){
 						window.location.href="/marissa/guias.asp"

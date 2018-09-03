@@ -1,5 +1,6 @@
 <!--#include file="../includes/Cnn.inc"-->
 <% session.LCID = 2057 %>
+<% Response.CacheControl = "no-cache" %>
 <%
 cad = "select * from rhin..factura_cab where estado <> 'e' order by id desc"
 if request.querystring("cliente") <> undefined and request.querystring("cliente") <> undefined or request.querystring("po") <> undefined and request.querystring("estilo") <> undefined  then

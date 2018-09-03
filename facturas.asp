@@ -1,17 +1,22 @@
+<% Response.CacheControl = "no-cache" %>
+<% Response.Buffer = true %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <title>Facturas</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1,
       maximum-scale=1, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="https://bootswatch.com/3/flatly/bootstrap.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-  
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
+
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="./js/jquery.dataTables.js"></script>
   <style>
          table{
          font-size:1.2rem;
@@ -301,232 +306,227 @@
 </div>
 </div>
   <!--VUE-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./js/vue.min.js"></script>
+  <script src="./js/axios.min.js"></script>
   <script>
 
 
     var app = new Vue({
-      el: '#guias',
-      data: {
-        list: [],
-        factura:{},
-        detalle:[],
-        newdetalle:{},
-        cargando:false,
-        total:0.00,
-        igv:0.00,
-      },
-      mounted: function () {
-        this.getFacturas();
-        this.user();
-      },
-      methods: {
-        user(){
-			if(localStorage.getItem("user")== null){
-				window.location.href="/marissa/index.asp"
-			}
-		  },
-       getFacturas: function () {
-          axios.get("/marissa/lists/facturas.asp").then(
-            (res) => {
-              console.log(res)
-              this.list = (res.data.data);
-              setTimeout(() => {
-                this.initDt();
-              }, 200);
+            el: '#guias',
+            data: {
+                list: [],
+                factura: {},
+                detalle: [],
+                newdetalle: {},
+                cargando: false,
+                total: 0.00,
+                igv: 0.00
+            },
+            mounted: function() {
+                this.getFacturas();
+                this.user();
+            },
+            methods: {
+                user: function() {
+                    if (localStorage.getItem("user") == null) {
+                        window.location.href = "/marissa/index.asp";
+                    }
+                },
+
+                getFacturas: function() {
+                    var _this = this;
+
+                    axios.get("/marissa/lists/facturas.asp").then(function(res) {
+                        console.log(res);
+                        _this.list = res.data.data;
+                        setTimeout(function() {
+                            _this.initDt();
+                        }, 200);
+                    }).catch(function(error) {});
+                },
+                eliminarfact: function(item) {
+                    var _this2 = this;
+
+                    var id = item.id;
+                    var cad = "/marissa/comun/deletefactura.asp?";
+                    cad += "ft=" + id;
+
+                    if (confirm("Deseas Eliminar factura " + item.serie + "-" + item.numdoc + " PO:" + item.po + " estilo:" + item.estilo)) {
+                        axios.get(cad).then(function(res) {
+                            _this2.getFacturas();
+                        });
+                    }
+                },
+
+                eliminardt: function(detalle) {
+                    var _this3 = this;
+
+                    if (confirm("Deseas eliminar este detalle?")) {
+                        var cad = "/marissa/comun/deletedetallefact.asp?id=" + detalle.id + "&ft=" + detalle.id_fact;
+                        console.log(cad);
+                        axios.get(cad).then(function(res) {
+                            _this3.verdetalle(_this3.factura);
+                        });
+                    }
+                },
+                guardardetalle: function() {
+                    var _this4 = this;
+
+                    this.cargando = true;
+                    id_fact = this.factura.id;
+                    descripcion = $("#txtdescripcion").val();
+                    cantidad = $("#txtcantidad").val();
+                    preciounit = $("#txtpreciounit").val();
+                    subtotat = $("#txtsubtotat").val();
+                    igv = $("#txtigv2").val();
+
+                    var cad = "/marissa/comun/insertdetallefact.asp?";
+                    cad += "id_fact=" + id_fact;
+                    cad += "&descripcion=" + descripcion;
+                    cad += "&cantidad=" + cantidad;
+                    cad += "&preciounit=" + preciounit;
+                    cad += "&subtotat=" + subtotat;
+                    cad += "&igv=" + igv;
+                    console.log(cad);
+
+                    axios.get(cad).then(function(res) {
+                        _this4.verdetalle(_this4.factura);
+                        _this4.getFacturas();
+                        _this4.cargando = false;
+                        $("#txtdescripcion").val("");
+                        $("#txtcantidad").val("");
+                        $("#txtpreciounit").val("");
+                        $("#txtsubtotat").val("");
+                        $("#txtigv2").val("");
+                        $("#lbltotal").text("");
+                        $("#txtdescripcion").focus();
+                    }).catch(function(error) {
+                        _this4.cargando = false;
+                    });
+                },
+                cerrar: function cerrar() {
+                    localStorage.removeItem("user");
+                    window.location.href = "/marissa/index.asp";
+                },
+actualizartotal: function(id, total, igv) {
+                            var _this6 = this;
+
+                            var cad = "/marissa/comun/updatetotalft.asp?id=" + id + "&total=" + total + "&igv=" + igv;
+
+                            console.log(cad);
+                            axios.get(cad).then(function(res) {
+                                console.log(res);
+                                _this6.getFacturas();
+                            });
+                        },
+                        initDt: function() {
+                            $(document).ready(function() {
+                                $('#table').DataTable();
+                            });
+                        },
+
+                        guardarFactura: function() {
+                            var _this7 = this;
+
+                            var cliente = $("#txtcliente").val();
+                            var po = $("#txtpo").val();
+                            var estilo = $("#txtestilo").val();
+                            var serie = $("#txtserie").val();
+                            var numdoc = $("#txtnumdoc").val();
+                            var fecha = $("#txtfecha").val();
+
+                            var numcheque = $("#txtnumcheque").val();
+                            var numletra = $("#txtnumletra").val();
+                            var tipo = $("#txttipo").val();
+                            var estado = $("#txtestado").val();
+                            cad = "/marissa/comun/insertfactura.asp?";
+                            cad = cad + "cliente=" + cliente;
+                            cad = cad + "&po=" + po;
+                            cad = cad + "&estilo=" + estilo;
+                            cad = cad + "&serie=" + serie;
+                            cad = cad + "&numdoc=" + numdoc;
+                            cad = cad + "&fecha=" + fecha;
+
+                            cad = cad + "&numcheque=" + numcheque;
+                            cad = cad + "&numletra=" + numletra;
+                            cad = cad + "&tipo=" + tipo;
+                            cad = cad + "&estado=" + estado;
+                            console.log(cad);
+                            axios.get(cad).then(function(res) {
+                                console.log(res);
+                                _this7.getFacturas();
+                                $("#txtcliente").val("");
+                                $("#txtpo").val("");
+                                $("#txtestilo").val("");
+                                $("#txtserie").val("");
+                                $("#txtnumdoc").val("");
+                                $("#txtfecha").val("");
+                                $("#txtnumcheque").val("");
+                                $("#txtnumletra").val("");
+                                $("#txttipo").val("");
+                                $("#txtestado").val("");
+                                $("#mymodal").modal("hide");
+                            }).catch(function(error) {});
+                        },
+                verdetalle: function(factura) {
+                    var _this5 = this;
+                    $("#myModaldetalle").modal("show");
+                    this.factura = {};
+                    this.factura = factura;
+                    this.detalle = [];
+                    var cad = "/marissa/lists/detallefactura.asp?id=" + factura.id;
+                    axios.get(cad).then(function(res) {
+                                console.log(cad);
+                                console.log(res.data.data);
+                                if (res.data.data == {} || res.data.data == undefined) {
+                                    _this5.actualizartotal(_this5.factura.id, 0, 0);
+                                }
+                                _this5.detalle = res.data.data;
+                                _this5.total = 0.00;
+                                _this5.igv = 0.00;
+
+                                for (var _i = 0, _a = this.detalle; _i < _a.length; _i++) {
+                                    var a = _a[_i];
+                                    _this5.total += parseFloat(a.subtotal) + parseFloat(a.igv);
+                                    _this5.igv = parseFloat(_this5.igv) + parseFloat(a.igv);
+                                }
+                                _this5.actualizartotal(_this5.factura.id, _this5.total, _this5.igv);
+
+
+                            });
+                        },
+                        
+                }
+            });
+
+        function buscarguia() {
+            var cli = $("#txtcliente").val();
+            var po = $("#txtpo").val();
+            var est = $("#txtestilo").val();
+            window.open("./help/hlpguia.asp?cliente=" + cli + "&po=" + po + "&estilo=" + est, "", "width=900,height=500");
+        }
+
+        function calcula() {
+            cantidad = $("#txtcantidad").val();
+            preciounit = $("#txtpreciounit").val();
+            subtotat = $("#txtsubtotat").val(cantidad * preciounit);
+            console.log(app.factura.tipo);
+            var t = cantidad * preciounit + cantidad * preciounit * 0.18;
+            $("#lbltotal").text(round(t));
+            if (!app.factura.tipo.includes("e")) {
+                var i = round(cantidad * preciounit * 0.18, 2);
+                $("#txtigv2").val(i);
+            } else {
+                $("#txtigv2").val(0);
             }
-          ).catch(
-            (error) => {
+        }
 
-            }
-          );
-        },
-        eliminarfact(item){
-            var id=item.id;
-            var cad = "/marissa/comun/deletefactura.asp?";
-            cad +="ft="+id;
+        function round(num) {
+            var precision = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
-
-            if(confirm(`Deseas Eliminar factura ${item.serie}-${item.numdoc} PO:${item.po} estilo:${item.estilo}`)){
-                axios.get(cad).then((res)=>{
-                    this.getFacturas();
-                });
-            }
-        },
-        eliminardt:function(detalle){
-          if(confirm("Deseas eliminar este detalle?")){
-            var cad="/marissa/comun/deletedetallefact.asp?id="+detalle.id+"&ft="+detalle.id_fact;
-            console.log(cad);
-            axios.get(cad).then(res=>{
-              this.verdetalle(this.factura);
-            })
-          }
-        },
-        guardardetalle:function(){
-          this.cargando=true;
-          id_fact=this.factura.id;
-          descripcion=$("#txtdescripcion").val();
-          cantidad=$("#txtcantidad").val();
-          preciounit=$("#txtpreciounit").val();
-          subtotat=$("#txtsubtotat").val();
-          igv=$("#txtigv2").val();
-
-          var cad = "/marissa/comun/insertdetallefact.asp?";
-          cad+="id_fact="+id_fact;
-          cad+="&descripcion="+descripcion;
-          cad+="&cantidad="+cantidad;
-          cad+="&preciounit="+preciounit;
-          cad+="&subtotat="+subtotat;
-          cad+="&igv="+igv;
-          console.log(cad);
-
-
-          axios.get(cad).then(
-            (res) => {
-              this.verdetalle(this.factura);
-              this.getFacturas();
-              this.cargando=false;
-              $("#txtdescripcion").val("");
-              $("#txtcantidad").val("");
-              $("#txtpreciounit").val("");
-              $("#txtsubtotat").val("");
-              $("#txtigv2").val("");
-              $("#lbltotal").text("")
-              $("#txtdescripcion").focus();
-            }
-          ).catch(
-            (error) => {
-              this.cargando=false;
-            }
-          );
-
-
-        },
-        cerrar(){
-            localStorage.removeItem("user");
-            window.location.href="/marissa/index.asp";
-          },
-        verdetalle:function(factura){
-          $("#myModaldetalle").modal("show");
-          this.factura={};
-          this.factura=factura;
-          this.detalle=[]; 
-          axios.get("/marissa/lists/detallefactura.asp?id="+factura.id).then(
-            (res) => {
-              console.log("detalle",res.data.data);
-              if(res.data.data=={} || res.data.data==undefined){
-                this.actualizartotal(this.factura.id,0,0);    
-              }
-              this.detalle=res.data.data;
-              this.total=0.00;
-              this.igv=0.00;
-              for(let a of this.detalle)
-              {
-                 this.total += parseFloat(a.subtotal)+parseFloat(a.igv);
-                 this.igv =parseFloat(this.igv) + parseFloat(a.igv);
-              }
-              this.actualizartotal(this.factura.id,this.total,this.igv);    
-              
-            }
-          ).catch(
-            (error) => {
-              
-            }
-          );
-          
-          
-
-        },
-        actualizartotal:function(id,total,igv){
-          
-          var cad = "/marissa/comun/updatetotalft.asp?id="+id+"&total="+total+"&igv="+igv;
-          
-          console.log(cad);
-          axios.get(cad).then((res)=>{
-              console.log(res);
-              this.getFacturas();
-          });
-          
-        },
-        initDt(){
-              $(document).ready( function () {
-                    $('#table').DataTable();
-                } );
-          },
-        guardarFactura:function(){
-          var cliente=$("#txtcliente").val();
-          var po=$("#txtpo").val();
-          var estilo=$("#txtestilo").val();
-          var serie=$("#txtserie").val();
-          var numdoc=$("#txtnumdoc").val();
-          var fecha=$("#txtfecha").val();
-          
-          var numcheque=$("#txtnumcheque").val();
-          var numletra=$("#txtnumletra").val();
-          var tipo=$("#txttipo").val();
-          var estado=$("#txtestado").val();
-          cad="/marissa/comun/insertfactura.asp?";
-          cad=cad+"cliente="+cliente;
-          cad=cad+"&po="+po;
-          cad=cad+"&estilo="+estilo;
-          cad=cad+"&serie="+serie;
-          cad=cad+"&numdoc="+numdoc;
-          cad=cad+"&fecha="+fecha;
-          
-          cad=cad+"&numcheque="+numcheque;
-          cad=cad+"&numletra="+numletra;
-          cad=cad+"&tipo="+tipo;
-          cad=cad+"&estado="+estado;
-          console.log(cad);
-          axios.get(cad).then(
-            (res) => {
-              console.log(res)
-              this.getFacturas();
-              $("#txtcliente").val("");
-              $("#txtpo").val("");
-              $("#txtestilo").val("");
-              $("#txtserie").val("");
-              $("#txtnumdoc").val("");
-              $("#txtfecha").val("");
-              $("#txtnumcheque").val("");
-              $("#txtnumletra").val("");
-              $("#txttipo").val("");
-              $("#txtestado").val("");
-              $("#mymodal").modal("hide");
-            }
-          ).catch(
-            (error) => {
-
-            }
-          );
-        },
-      }
-    });
-    function buscarguia(){
-      var cli=$("#txtcliente").val();
-      var po=$("#txtpo").val();
-      var est=$("#txtestilo").val();
-      window.open("./help/hlpguia.asp?cliente="+cli+"&po="+po+"&estilo="+est,"","width=900,height=500");
-    }
-    function calcula(){
-      cantidad=$("#txtcantidad").val();
-      preciounit=$("#txtpreciounit").val();
-      subtotat=$("#txtsubtotat").val(cantidad*preciounit);
-      console.log(app.factura.tipo);
-      var t=cantidad*preciounit+((cantidad*preciounit)*0.18);
-      $("#lbltotal").text(round(t));
-      if(!app.factura.tipo.includes("e")){
-        var i=round((cantidad*preciounit)*0.18,2);
-        $("#txtigv2").val(i);
-      }else{
-        $("#txtigv2").val(0);
-      }
-    }
-    function round(num, precision = 2) {
-      var scaled = Math.round(num + "e" + precision);
-      return Number(scaled + "e" + -precision);
-    }
+            var scaled = Math.round(num + "e" + precision);
+            return Number(scaled + "e" + -precision);
+        }
   </script>
 
 

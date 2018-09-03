@@ -1,15 +1,22 @@
+<% Response.CacheControl = "no-cache" %>
+<% Response.Buffer = true %>
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <title>Guias</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1,
-         maximum-scale=1, user-scalable=no, minimal-ui">
-      <link rel="stylesheet" href="https://bootswatch.com/3/flatly/bootstrap.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Guias</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1,
+      maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
+
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="./js/jquery.dataTables.js"></script>
       <style>
          table{
          font-size:1.2rem;
@@ -283,159 +290,161 @@
       </div>
       </div>
       <!--VUE-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
-      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.min.js"></script>
       <script>
          var app = new Vue({
-           el: '#guias',
-           data: {
-             list: [],
-             facturas:[],
-             oc:[]
-           },
-           mounted: function () {
-             this.user();
-             this.getGuias();
-           },
-           methods: {
-               user(){
-         if(localStorage.getItem("user")== null){
-         window.location.href="/marissa/index.asp"
-         }
-               },
-             eliminarguia(item){
-                 var prov=item.proveedor;
-                 var serie=item.serie;
-                 var numdoc=item.numdoc;
-                 var cad = "/marissa/comun/deleteguia.asp?";
-                 cad +="prov="+prov;
-                 cad +="&serie="+serie;
-                 cad +="&numdoc="+numdoc;
-         
-         
-                 if(confirm(`Deseas Eliminar la guia del prov: ${prov} serie:${serie} numdoc:${numdoc}`)){
-                     axios.get(cad).then((res)=>{
-                         this.getGuias();
-                     });
-                 }
-             },
-             getGuias: function () {
-               axios.get("/marissa/lists/guias.asp").then(
-                 (res) => {
-                   console.log(res)
-                   this.list = (res.data.data);
-                       this.initDt()
-                 }
-               ).catch(
-                 (error) => {
-         
-                 }
-               );
-             },
-         limpiarcampos:function(){
-         $("#txtcliente").val("");
-               	$("#txtestilo").val("");
-         $("#txtpo").val("");
-         $("#txtpresupuesto").val("");
-         $("#txtserie").val("");
-         $("#txtnumdoc").val("");
-         $("#txtfecemi").val("");
-               	$("#txtfectras").val("");
-         $("#txtcorte").val("");
-         $("#txtnumprend").val("");
-         $("#txtnumord").val("");
-         $("#txtservicio").val("");
-                 $("#txtproveedor").val("");
-                 $("#txtproveedor").removeAttr('readonly');
-                 $("#lblproveedor").text("Proveedor");
-         },
-         grabarnuevaguia:function(){
-         var txtcliente=$("#txtcliente").val();
-               	var txtestilo=$("#txtestilo").val();
-         var txtpo=$("#txtpo").val();
-         var txtpresupuesto=$("#txtpresupuesto").val();
-                 var txtproveedor=$("#txtproveedor").val();
-         var txtserie=$("#txtserie").val();
-         var txtnumdoc=$("#txtnumdoc").val();
-         var txtfecemi=$("#txtfecemi").val();
-               	var txtfectras=$("#txtfectras").val();
-         var txtcorte=$("#txtcorte").val();
-         var txtnumprend=$("#txtnumprend").val();
-         var txtnumord=$("#txtnumord").val();
-         var txtservicio=$("#txtservicio").val();
-         
-         if(txtcliente=="" || txtpresupuesto=="" || txtpo=="" || txtestilo=="" || txtnumdoc=="" || txtserie=="" || txtproveedor==""){
-         alert("Llene los campos correctamente");
-         }else{
-         
-         
-         var cad = "/marissa/comun/insertguia.asp?";
-         cad+="presupuesto="+txtpresupuesto;
-         cad+="&cliente="+txtcliente;
-         cad+="&po="+txtpo;
-         cad+="&estilo="+txtestilo;
-         cad+="&serie ="+txtserie;
-         cad+="&numdoc="+txtnumdoc;
-         cad+="&proveedor="+txtproveedor;
-         cad+="&fecha_emision="+txtfecemi;
-         cad+="&fecha_traslado="+txtfectras;
-         cad+="&nro_orde="+txtnumord;
-         cad+="&corte="+txtcorte;
-         cad+="&num_prendas="+txtnumprend;
-         cad+="&tip_servicio="+txtservicio;
-         console.log(cad);
-         axios.get(cad).then(
-         (res) => {
-         	this.getGuias();
-         	this.limpiarcampos();
-         }
-         ).catch(
-         (error) => {
-         	this.list = [];
-         }
-         );
-         }
-         
-         
-         
-         
-         },
-             cerrar(){
-                 localStorage.removeItem("user");
-                 window.location.href="/marissa/index.asp";
-               },
-               initDt(){
-                   setTimeout(() => {
-                       $(document).ready( function () {
-                         $('#table').DataTable();
-                     } );
-                   }, 100);
-               },
-         verDatos:function(item){
-           $("#myModaldetalle").modal("toggle");
-           var cadf = "/marissa/lists/facturas.asp?cliente="+item.cliente+"&po="+item.po+"&estilo="+item.estilo;
-           axios.get(cadf).then(res=>{this.facturas=res.data.data}).catch();
-           var cado = "/marissa/lists/oc.asp?cliente="+item.cliente+"&po="+item.po+"&estilo="+item.estilo;
-           axios.get(cado).then(res=>{this.oc=res.data.data}).catch();
-         },
-             buscar: function () {
-               var estilo=$("#txtbuscarestilo").val();
-               var po=$("#txtbuscarpo").val();
-               var cliente=$("#txtbuscarcliente").val();
-               axios.get("/marissa/lists/guias.asp?cliente="+cliente+"&po="+po+"&estilo="+estilo).then(
-                 (res) => {
-                   console.log(res)
-                   this.list = (res.data.data);
-                   app.initDt()
-                 }
-               ).catch(
-                 (error) => {
-                   this.list = [];
-                 }
-               );
-             }
-           }
-         });
+              el: '#guias',
+              data: {
+                  list: [],
+                  facturas: [],
+                  oc: []
+              },
+              mounted: function() {
+                  this.user();
+                  this.getGuias();
+              },
+              methods: {
+                  user: function() {
+                      if (localStorage.getItem("user") == null) {
+                          window.location.href = "/marissa/index.asp"
+                      }
+                  },
+                  eliminarguia: function(item) {
+                      var prov = item.proveedor;
+                      var serie = item.serie;
+                      var numdoc = item.numdoc;
+                      var cad = "/marissa/comun/deleteguia.asp?";
+                      cad += "prov=" + prov;
+                      cad += "&serie=" + serie;
+                      cad += "&numdoc=" + numdoc;
+                      var that = this;
+
+                      if (confirm("Deseas Eliminar la guia del prov: " + prov + " serie:" + serie + " numdoc:" + numdoc)) {
+                          axios.get(cad).then(function(res) {
+                              that.getGuias();
+                              console.log(cad);
+                          });
+                      }
+                  },
+                  getGuias: function() {
+                      var that = this;
+                      axios.get("/marissa/lists/guias.asp").then(function(res) {
+                          console.log(res);
+                          that.list = res.data.data;
+                          that.initDt();
+                      }).catch(function(error) {});
+                  },
+                  limpiarcampos: function() {
+                      $("#txtcliente").val("");
+                      $("#txtestilo").val("");
+                      $("#txtpo").val("");
+                      $("#txtpresupuesto").val("");
+                      $("#txtserie").val("");
+                      $("#txtnumdoc").val("");
+                      $("#txtfecemi").val("");
+                      $("#txtfectras").val("");
+                      $("#txtcorte").val("");
+                      $("#txtnumprend").val("");
+                      $("#txtnumord").val("");
+                      $("#txtservicio").val("");
+                      $("#txtproveedor").val("");
+                      $("#txtproveedor").removeAttr('readonly');
+                      $("#lblproveedor").text("Proveedor");
+                  },
+                  grabarnuevaguia: function() {
+                      var txtcliente = $("#txtcliente").val();
+                      var txtestilo = $("#txtestilo").val();
+                      var txtpo = $("#txtpo").val();
+                      var txtpresupuesto = $("#txtpresupuesto").val();
+                      var txtproveedor = $("#txtproveedor").val();
+                      var txtserie = $("#txtserie").val();
+                      var txtnumdoc = $("#txtnumdoc").val();
+                      var txtfecemi = $("#txtfecemi").val();
+                      var txtfectras = $("#txtfectras").val();
+                      var txtcorte = $("#txtcorte").val();
+                      var txtnumprend = $("#txtnumprend").val();
+                      var txtnumord = $("#txtnumord").val();
+                      var txtservicio = $("#txtservicio").val();
+                      var that = this;
+                      if (txtcliente == "" || txtpresupuesto == "" || txtpo == "" || txtestilo == "" || txtnumdoc == "" || txtserie == "" || txtproveedor == "") {
+                          alert("Llene los campos correctamente");
+                      } else {
+
+
+                          var cad = "/marissa/comun/insertguia.asp?";
+                          cad += "presupuesto=" + txtpresupuesto;
+                          cad += "&cliente=" + txtcliente;
+                          cad += "&po=" + txtpo;
+                          cad += "&estilo=" + txtestilo;
+                          cad += "&serie =" + txtserie;
+                          cad += "&numdoc=" + txtnumdoc;
+                          cad += "&proveedor=" + txtproveedor;
+                          cad += "&fecha_emision=" + txtfecemi;
+                          cad += "&fecha_traslado=" + txtfectras;
+                          cad += "&nro_orde=" + txtnumord;
+                          cad += "&corte=" + txtcorte;
+                          cad += "&num_prendas=" + txtnumprend;
+                          cad += "&tip_servicio=" + txtservicio;
+                          console.log(cad);
+                          axios.get(cad).then(
+                              function(res) {
+                                  that.getGuias();
+                                  that.limpiarcampos();
+                              }
+                          ).catch(
+                              function(error) {
+                                  that.list = [];
+                              }
+                          );
+                      }
+
+
+
+
+                  },
+                  cerrar: function() {
+                      localStorage.removeItem("user");
+                      window.location.href = "/marissa/index.asp";
+                  },
+                  initDt: function() {
+                      setTimeout(function() {
+                          $(document).ready(function() {
+                              $('#table').DataTable();
+                          });
+                      }, 100);
+                  },
+                  verDatos: function(item) {
+                      var that = this;
+                      $("#myModaldetalle").modal("toggle");
+                      var cadf = "/marissa/lists/facturas.asp?cliente=" + item.cliente + "&po=" + item.po + "&estilo=" + item.estilo;
+                      axios.get(cadf).then(function(res) {
+                          that.facturas = res.data.data
+                      }).catch();
+                      var cado = "/marissa/lists/oc.asp?cliente=" + item.cliente + "&po=" + item.po + "&estilo=" + item.estilo;
+                      axios.get(cado).then(function(res) {
+                          that.oc = res.data.data
+                      }).catch();
+                  },
+                  buscar: function() {
+                      var that = this;
+                      var estilo = $("#txtbuscarestilo").val();
+                      var po = $("#txtbuscarpo").val();
+                      var cliente = $("#txtbuscarcliente").val();
+                      axios.get("/marissa/lists/guias.asp?cliente=" + cliente + "&po=" + po + "&estilo=" + estilo).then(
+                          function(res) {
+                              console.log(res)
+                              that.list = (res.data.data);
+                              app.initDt()
+                          }
+                      ).catch(
+                          function(error) {
+                              that.list = [];
+                          }
+                      );
+                  }
+              }
+          });
       </script>
    </body>
 </html>

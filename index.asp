@@ -13,7 +13,7 @@
 
 <body>
 <div id="app" class="container">
-    <nav class="navbar navbar-default" style="border-radius: 0px">
+    <nav class="navbar navbar-default " style="border-radius: 0px">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">

@@ -9,12 +9,27 @@
   <link rel="stylesheet" href="https://bootswatch.com/3/flatly/bootstrap.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+  <style>
+         table{
+         font-size:1.2rem;
+         }
+         body {
+  min-height: 2000px;
+  padding-top: 70px;
+}
+.pull-right2{
+  position:absolute !important;right:0 !important
+  }
+      </style>
 </head>
 
 <body>
 
   <div id="guias" class="container-fluid">
-    <nav class="navbar navbar-default" style="border-radius: 0px">
+    <nav class="navbar navbar-default  navbar-fixed-top" style="border-radius: 0px">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -34,7 +49,7 @@
             <li><a href="./guias.asp">Guias</a></li>
             <li class="active"><a href="./facturas.asp">facturas</a></li>
             <li><a href="./oc.asp">Ordenes Compra</a></li>
-            <li class="pull-right" v-on:click="cerrar()"><a >Cerrar Sesion</a></li>
+            <li class="pull-right2" v-on:click="cerrar()"><a >Cerrar Sesion</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
@@ -91,7 +106,7 @@
   </tr>
   </table>
   <br>
-  <table class="table table-bordered table-hover">
+  <table id="table" class="table table-bordered table-hover">
     <thead>
       <tr>
         <th>#</th>
@@ -317,6 +332,9 @@
             (res) => {
               console.log(res)
               this.list = (res.data.data);
+              setTimeout(() => {
+                this.initDt();
+              }, 200);
             }
           ).catch(
             (error) => {
@@ -431,6 +449,11 @@
           });
           
         },
+        initDt(){
+              $(document).ready( function () {
+                    $('#table').DataTable();
+                } );
+          },
         guardarFactura:function(){
           var cliente=$("#txtcliente").val();
           var po=$("#txtpo").val();

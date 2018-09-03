@@ -83,11 +83,12 @@ set rs = cnn.execute(cad)
 			if(window.opener.document.getElementById("txtproveedor") && window.opener.document.getElementById("txtnro_orden")){
 				window.opener.document.getElementById("txtproveedor").value =proveedor;
 				window.opener.document.getElementById("txtnro_orden").value =nroorden;
-				window.opener.document.getElementById("txtpresupuesto").value =parseFloat(presupuesto);
 				
 			}
-			
-    		window.close();
+			if(window.opener.document.getElementById("txtpresupuesto")){
+				window.opener.document.getElementById("txtpresupuesto").value =parseFloat(presupuesto);
+				}
+    		 window.close();
     	}
     	function buscar(cliente,po,estilo){
     		window.location="./hlpguia.asp?cliente="+cliente+"&po="+po+"&estilo="+estilo;

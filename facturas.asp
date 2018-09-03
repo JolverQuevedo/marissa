@@ -13,7 +13,7 @@
 
 <body>
 
-  <div id="guias" class="container">
+  <div id="guias" class="container-fluid">
     <nav class="navbar navbar-default" style="border-radius: 0px">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -101,18 +101,21 @@
         <th>serie</th>
         <th>numdoc</th>
         <th>fecha</th>
-        
         <th>numcheque</th>
         <th>numletra</th>
         <th>tipo</th>
         <th>estado</th>
         <th>Total</th>
         <th>igv</th>
+        <th>presupuesto</th>
+        <th>Acción</th>
+
       </tr>
     </thead>
     <tbody>
       <tr style="cursor:pointer" v-for="item in list" v-on:dblclick="verdetalle(item)">
         <td v-for="c in item" >{{c}}</td>
+        <td><button class="btn btn-danger btn-sm" v-on:click="eliminarfact(item)">Eliminar</button></td>
       </tr>
     </tbody>
 
@@ -129,22 +132,23 @@
         </div>
         <div class="modal-body">
 
-          <div class="row"><button class="btn btn-primary col-md-12" onclick="buscarguia()" >Buscar Guia</button></div>
+          
           
           <div class="row">
             <div class="form-group col-md-4">
               <label>cliente</label>
-              <input class="form-control" id="txtcliente" readonly>
+              <input class="form-control" id="txtcliente" >
             </div>
 
             <div class="form-group  col-md-4">
               <label>po</label>
-              <input class="form-control" id="txtpo" readonly>
+              <input class="form-control" id="txtpo" >
             </div>
             <div class="form-group col-md-4">
               <label>estilo</label>
-              <input class="form-control" id="txtestilo" readonly>
+              <input class="form-control" id="txtestilo" >
             </div>
+            <button class="btn btn-primary col-md-12" onclick="buscarguia()" >Buscar Guia</button>
             <div class="form-group col-md-6">
             <label>serie</label>
             <input class="form-control" type="text" maxlength="3"  id="txtserie">
@@ -163,9 +167,13 @@
             <input class="form-control" id="txtnumcheque">
           </div>
 
-          <div class="form-group col-md-12">
+          <div class="form-group col-md-6">
             <label>numletra</label>
             <input class="form-control" id="txtnumletra">
+          </div>
+          <div class="form-group col-md-6">
+            <label>presupuesto</label>
+            <input class="form-control" type="number" id="txtpresupuesto">
           </div>
           <div class="form-group col-md-6">
             <label>tipo</label>
@@ -316,6 +324,18 @@
             }
           );
         },
+        eliminarfact(item){
+            var id=item.id;
+            var cad = "/marissa/comun/deletefactura.asp?";
+            cad +="ft="+id;
+
+
+            if(confirm(`Deseas Eliminar factura ${item.serie}-${item.numdoc} PO:${item.po} estilo:${item.estilo}`)){
+                axios.get(cad).then((res)=>{
+                    this.getFacturas();
+                });
+            }
+        },
         eliminardt:function(detalle){
           if(confirm("Deseas eliminar este detalle?")){
             var cad="/marissa/comun/deletedetallefact.asp?id="+detalle.id+"&ft="+detalle.id_fact;
@@ -461,7 +481,10 @@
       }
     });
     function buscarguia(){
-      window.open("./help/hlpguia.asp","","width=900,height=500");
+      var cli=$("#txtcliente").val();
+      var po=$("#txtpo").val();
+      var est=$("#txtestilo").val();
+      window.open("./help/hlpguia.asp?cliente="+cli+"&po="+po+"&estilo="+est,"","width=900,height=500");
     }
     function calcula(){
       cantidad=$("#txtcantidad").val();

@@ -12,7 +12,7 @@
 </head>
 
 <body>
-<div id="guias" class="container">
+<div id="guias" class="container-fluid">
     <nav class="navbar navbar-default" style="border-radius: 0px">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -105,13 +105,14 @@
             <th>corte</th>
             <th>num_prendas </th>
             <th>tip_servicio</th>
-
+            <th>Estado</th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
         <tr style="cursor:pointer" v-for="item in list" v-on:dblclick="verDatos(item)">
             <td v-for="c in item">{{c}}</td>
-
+            <td><button class="btn btn-danger btn-sm" v-on:click="eliminarguia(item)">Eliminar</button></td>
         </tr>
     </tbody>
 
@@ -316,7 +317,23 @@
 			if(localStorage.getItem("user")== null){
 				window.location.href="/marissa/index.asp"
 			}
-		  },
+          },
+        eliminarguia(item){
+            var prov=item.proveedor;
+            var serie=item.serie;
+            var numdoc=item.numdoc;
+            var cad = "/marissa/comun/deleteguia.asp?";
+            cad +="prov="+prov;
+            cad +="&serie="+serie;
+            cad +="&numdoc="+numdoc;
+
+
+            if(confirm(`Deseas Eliminar la guia del prov: ${prov} serie:${serie} numdoc:${numdoc}`)){
+                axios.get(cad).then((res)=>{
+                    this.getGuias();
+                });
+            }
+        },
         getGuias: function () {
           axios.get("/marissa/lists/guias.asp").then(
             (res) => {
